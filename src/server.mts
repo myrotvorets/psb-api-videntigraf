@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { json } from 'express';
@@ -5,7 +6,6 @@ import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { cleanUploadedFilesMiddleware } from '@myrotvorets/clean-up-after-multer';
 import { createServer } from '@myrotvorets/create-server';
-import { memoryStorage } from 'multer';
 import morgan from 'morgan';
 
 import { environment } from './lib/environment.mjs';
@@ -25,9 +25,14 @@ export async function configureApp(app: express.Express): Promise<void> {
         env.NODE_ENV,
         {
             fileUploader: {
-                storage: memoryStorage(),
+                dest: tmpdir(),
                 limits: {
+                    fieldNameSize: 32,
+                    fieldSize: 1024,
+                    fields: 16,
                     fileSize: env.VIDENTIGRAF_MAX_FILE_SIZE,
+                    files: 1,
+                    headerPairs: 16,
                 },
             },
         },
