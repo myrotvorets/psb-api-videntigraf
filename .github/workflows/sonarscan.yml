@@ -32,3 +32,14 @@ jobs:
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           registry-url: https://npm.pkg.github.com
+
+      - name: Install codecov
+        run: npm i -g codecov
+
+      - name: Rebuild the project with sourcemaps
+        run: npm run build -- --sourcemap
+
+      - name: Run codecov
+        run: codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
