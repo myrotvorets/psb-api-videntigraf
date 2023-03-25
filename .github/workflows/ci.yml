@@ -1,0 +1,28 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
+    strategy:
+      matrix:
+        node:
+          - { name: Current, version: current }
+          - { name: LTS,     version: lts/* }
+    name: Build and test (Node ${{ matrix.node.name }})
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        with:
+          submodules: true
+
+      - name: Build and test
+        uses: myrotvorets/composite-actions/build-test-nodejs@master
+        with:
+          node-version: ${{ matrix.node.version }}
