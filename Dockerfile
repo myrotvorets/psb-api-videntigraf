@@ -22,11 +22,11 @@ RUN npm prune --omit=dev
 FROM myrotvorets/node-min@sha256:02c55eb8aeb4fc848120e1b844022f15535cf7e4775355081af9381bbad50219
 USER root
 WORKDIR /srv/service
-RUN chown nobody:nobody /srv/service && apk add --no-cache vips
+RUN chown nobody:nobody /srv/service && apk add --no-cache vips vips-cpp
 COPY healthcheck.sh /usr/local/bin/
 HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 CMD ["/usr/local/bin/healthcheck.sh"]
 USER nobody:nobody
-ENTRYPOINT ["/usr/bin/node", "index.js"]
+ENTRYPOINT ["/usr/bin/node", "index.mjs"]
 COPY --chown=nobody:nobody ./src/specs ./specs
 COPY --chown=nobody:nobody --from=build /srv/service/dist/ ./
 COPY --chown=nobody:nobody --from=build /srv/service/node_modules ./node_modules
