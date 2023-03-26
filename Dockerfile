@@ -3,7 +3,7 @@ USER root
 WORKDIR /srv/service
 RUN chown nobody:nobody /srv/service && apk add --no-cache vips-dev
 USER nobody:nobody
-COPY --chown=nobody:nobody ./package.json ./package-lock.json ./tsconfig.json .npmrc ./
+COPY --chown=nobody:nobody ./package.json ./package-lock.json ./tsconfig.json .npmrc* ./
 RUN \
     npm r --package-lock-only \
         @myrotvorets/eslint-config-myrotvorets-ts eslint-formatter-gha \
@@ -11,8 +11,8 @@ RUN \
         supertest @types/supertest \
         ts-node \
         nodemon && \
-    npm ci --ignore-scripts && \
-    rm -f .npmrc && \
+    npm ci --ignore-scripts --userconfig .npmrc.local && \
+    rm -f .npmrc.local && \
     npm rebuild && \
     npm run prepare --if-present
 COPY --chown=nobody:nobody ./src ./src
