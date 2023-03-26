@@ -1,10 +1,11 @@
 *
-!.npmrc
+!.npmrc*
 !src
 !package.json
 !package-lock.json
 !tsconfig.json
 !healthcheck.sh
+!nodemon.json
 
 src/**/.git
 *.d.ts

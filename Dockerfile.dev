@@ -1,0 +1,8 @@
+FROM myrotvorets/node:latest
+USER root
+WORKDIR /srv/service
+RUN apk add --no-cache vips-dev
+COPY ./package.json ./package-lock.json .npmrc .npmrc* ./
+RUN npm ci --userconfig .npmrc.local
+COPY . .
+ENTRYPOINT ["/usr/bin/npm", "run", "start:dev"]
