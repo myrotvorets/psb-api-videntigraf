@@ -19,7 +19,7 @@ COPY --chown=nobody:nobody ./src ./src
 RUN npm run build -- --declaration false --removeComments true --sourceMap false
 RUN npm prune --omit=dev
 
-FROM myrotvorets/node-min@sha256:48cbdbdb565a7eeb2d424c8bdf02990a5fd4b55e0692c19bcd1baaa61df08807
+FROM myrotvorets/node-min@sha256:e0ff34208e1616c5d6bd873659d0d0422bae125c581510aa41fb10dd744d454f
 USER root
 WORKDIR /srv/service
 RUN chown nobody:nobody /srv/service && apk add --no-cache vips vips-cpp
