@@ -1,26 +1,23 @@
-import express from 'express';
+import { afterEach, before, beforeEach } from 'mocha';
+import express, { type Express } from 'express';
 import request from 'supertest';
-import monitoringController, { healthChecker } from '../../../src/controllers/monitoring.mjs';
-
-let app: express.Express;
-
-function buildApp(): express.Express {
-    const application = express();
-    application.disable('x-powered-by');
-    application.use('/monitoring', monitoringController());
-    return application;
-}
-
-afterEach(() => {
-    process.removeAllListeners('SIGTERM');
-});
-
-beforeEach(() => {
-    app = buildApp();
-    healthChecker.shutdownRequested = false;
-});
+import { healthChecker, monitoringController } from '../../../src/controllers/monitoring.mjs';
 
 describe('MonitoringController', () => {
+    let app: Express;
+
+    before(() => {
+        app = express();
+        app.disable('x-powered-by');
+        app.use('/monitoring', monitoringController());
+    });
+
+    beforeEach(() => {
+        healthChecker.shutdownRequested = false;
+    });
+
+    afterEach(() => process.removeAllListeners('SIGTERM'));
+
     const checker200 = (endpoint: string): Promise<unknown> =>
         request(app).get(`/monitoring/${endpoint}`).expect('Content-Type', /json/u).expect(200);
 

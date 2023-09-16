@@ -10,8 +10,8 @@ import morgan from 'morgan';
 
 import { environment } from './lib/environment.mjs';
 
-import videoController from './controllers/video.mjs';
-import monitoringController from './controllers/monitoring.mjs';
+import { videoController } from './controllers/video.mjs';
+import { monitoringController } from './controllers/monitoring.mjs';
 import { uploadErrorHandlerMiddleware } from './middleware/upload.mjs';
 
 export async function configureApp(app: express.Express): Promise<void> {
@@ -45,7 +45,7 @@ export async function configureApp(app: express.Express): Promise<void> {
     );
 }
 
-/* istanbul ignore next */
+/* c8 ignore start */
 export function setupApp(): express.Express {
     const app = express();
     app.set('strict routing', true);
@@ -60,7 +60,6 @@ export function setupApp(): express.Express {
     return app;
 }
 
-/* istanbul ignore next */
 export async function run(): Promise<void> {
     const [env, app] = [environment(), setupApp()];
 
@@ -71,3 +70,4 @@ export async function run(): Promise<void> {
     const server = await createServer(app);
     server.listen(env.PORT);
 }
+/* c8 ignore end */

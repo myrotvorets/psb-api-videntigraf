@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
-import { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
+import type { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
 
-export function uploadErrorHandlerMiddleware(err: unknown, req: Request, res: Response, next: NextFunction): void {
+export function uploadErrorHandlerMiddleware(err: unknown, _req: Request, _res: Response, next: NextFunction): void {
     if (err && typeof err === 'object' && err instanceof MulterError) {
         const response: ErrorResponse = {
             success: false,

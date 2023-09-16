@@ -1,6 +1,6 @@
 import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
 import { FaceXVideoClient } from '@myrotvorets/facex';
-import { Request, RequestHandler, Response, Router } from 'express';
+import { type Request, type RequestHandler, type Response, Router } from 'express';
 import { environment } from '../lib/environment.mjs';
 import { faceXErrorHandlerMiddleware } from '../middleware/error.mjs';
 import { uploadErrorHandlerMiddleware } from '../middleware/upload.mjs';
@@ -73,7 +73,7 @@ function resultHandler(service: VideoService, what: 'detect' | 'match'): Request
     };
 }
 
-export default function (): Router {
+export function videoController(): Router {
     const env = environment();
 
     const router = Router();

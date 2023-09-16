@@ -7,10 +7,8 @@ COPY --chown=nobody:nobody ./package.json ./package-lock.json ./tsconfig.json .n
 RUN \
     npm r --package-lock-only \
         @myrotvorets/eslint-config-myrotvorets-ts eslint-formatter-gha \
-        @types/jest jest ts-jest jest-sonar-reporter jest-github-actions-reporter \
-        supertest @types/supertest \
-        ts-node \
-        nodemon && \
+        mocha @types/mocha chai @types/chai chai-as-promised @types/chai-as-promised supertest @types/supertest testdouble c8 mocha-multi mocha-reporter-gha mocha-reporter-sonarqube \
+        ts-node nodemon && \
     npm ci --ignore-scripts --userconfig .npmrc.local && \
     rm -f .npmrc.local && \
     npm rebuild && \

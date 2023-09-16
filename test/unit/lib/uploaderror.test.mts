@@ -1,3 +1,5 @@
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
 import { UploadError } from '../../../src/lib/uploaderror.mjs';
 
 describe('UploadError', () => {
@@ -5,8 +7,10 @@ describe('UploadError', () => {
         const expectedMessage = 'message';
         const expectedFile = 'file';
         const error = new UploadError(expectedMessage, expectedFile);
-        expect(error).toHaveProperty('message', expectedMessage);
-        expect(error).toHaveProperty('file', expectedFile);
-        expect(error).toHaveProperty('name', UploadError.name);
+        expect(error).to.be.instanceOf(UploadError).and.include({
+            message: expectedMessage,
+            file: expectedFile,
+            name: UploadError.name,
+        });
     });
 });
