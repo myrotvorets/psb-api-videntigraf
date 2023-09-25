@@ -1,9 +1,8 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { BadRequestError } from '../../../src/lib/badrequesterror.mjs';
 
-describe('BadRequestError', () => {
-    it('should be correct', () => {
+describe('BadRequestError', function () {
+    it('should be correct', function () {
         const expectedMessage = 'message';
         const error = new BadRequestError(expectedMessage);
         expect(error).to.be.instanceOf(BadRequestError).and.include({

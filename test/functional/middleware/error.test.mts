@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
 import express, { type Express, type NextFunction } from 'express';
 import request from 'supertest';
@@ -9,11 +8,15 @@ import { environment } from '../../../src/lib/environment.mjs';
 import { UploadError } from '../../../src/lib/uploaderror.mjs';
 import { faceXErrorHandlerMiddleware } from '../../../src/middleware/error.mjs';
 
-describe('faceXErrorHandlerMiddleware', () => {
+describe('faceXErrorHandlerMiddleware', function () {
     let app: Express;
-    const env = { ...process.env };
+    let env: typeof process.env;
 
-    beforeEach(() => {
+    before(function () {
+        env = { ...process.env };
+    });
+
+    beforeEach(function () {
         process.env = {
             NODE_ENV: 'test',
             PORT: '3030',
@@ -26,7 +29,7 @@ describe('faceXErrorHandlerMiddleware', () => {
         app.disable('x-powered-by');
     });
 
-    afterEach(() => {
+    afterEach(function () {
         process.env = { ...env };
     });
 
@@ -39,7 +42,7 @@ describe('faceXErrorHandlerMiddleware', () => {
 
     const expectBadGateway = (res: request.Response): unknown => expectError(res, 'BAD_GATEWAY', 502);
 
-    it('should ignore non-errors', () => {
+    it('should ignore non-errors', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(123));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
@@ -49,7 +52,7 @@ describe('faceXErrorHandlerMiddleware', () => {
             .expect((res) => expect(res.body).to.deep.equal({}));
     });
 
-    it('should catch UploadError', () => {
+    it('should catch UploadError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new UploadError('message', 'file')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
@@ -60,7 +63,7 @@ describe('faceXErrorHandlerMiddleware', () => {
             .expect((res) => expectError(res, 'UPLOAD_FAILED', 400));
     });
 
-    it('should catch FaceX HttpError', () => {
+    it('should catch FaceX HttpError', function () {
         app.use('/', (_req, _res, next: NextFunction) =>
             next(new HttpError({ status: 418, statusText: "I'm a teapot" })),
         );
@@ -69,21 +72,21 @@ describe('faceXErrorHandlerMiddleware', () => {
         return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
-    it('should catch FaceX NetworkError', () => {
+    it('should catch FaceX NetworkError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new NetworkError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
         return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
-    it('should catch FaceX BadResponseError', () => {
+    it('should catch FaceX BadResponseError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new BadResponseError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
         return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
-    it('should catch BadRequestError', () => {
+    it('should catch BadRequestError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new BadRequestError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
@@ -94,7 +97,7 @@ describe('faceXErrorHandlerMiddleware', () => {
             .expect((res) => expectError(res, 'BAD_REQUEST', 400));
     });
 
-    it('should catch FaceXError', () => {
+    it('should catch FaceXError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new FaceXError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);

@@ -1,4 +1,3 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { matchers, when } from 'testdouble';
 import {
@@ -27,20 +26,25 @@ import {
     successfulVideoUploadResponse,
 } from './fixtures.mjs';
 
-describe('VideoService', () => {
-    const service = new VideoService(new FakeFaceXVideoClient('https://example.com', 'client_id'));
+describe('VideoService', function () {
+    let service: VideoService;
 
-    describe('#upload()', () => {
-        it('should fail on error', () => {
+    before(function () {
+        service = new VideoService(new FakeFaceXVideoClient('https://example.com', 'client_id'));
+    });
+
+    describe('#upload()', function () {
+        it('should fail on error', function () {
             const response = responseFactory(failedVideoUploadResponse) as VideoUploadAck;
 
             when(uploadVideo(matchers.anything() as VideoType, matchers.anything() as VideoUploadPriority)).thenResolve(
                 response,
             );
+
             return expect(service.upload(fakeFile)).to.be.rejectedWith(UploadError);
         });
 
-        it('should return GUID on success', () => {
+        it('should return GUID on success', function () {
             const expectedGUID = '00000000-0000-0000-0000-000000000001';
             const response = responseFactory(successfulVideoUploadResponse(expectedGUID)) as VideoUploadAck;
 
@@ -52,22 +56,22 @@ describe('VideoService', () => {
         });
     });
 
-    describe('#getVideoStatus()', () => {
-        it('should fail on error', () => {
+    describe('#getVideoStatus()', function () {
+        it('should fail on error', function () {
             const response = responseFactory(failedStatusResponse) as VideoStatus;
 
             when(getVideoStatus(clientGUID)).thenResolve(response);
             return expect(service.status(clientGUID)).to.be.rejectedWith(FaceXError);
         });
 
-        it('should return false if the result is not ready', () => {
+        it('should return false if the result is not ready', function () {
             const response = responseFactory(inProgressStatusResponse) as VideoStatus;
 
             when(getVideoStatus(clientGUID)).thenResolve(response);
             return expect(service.status(clientGUID)).to.eventually.be.false;
         });
 
-        it('should return proper data on success', () => {
+        it('should return proper data on success', function () {
             const expectedResult: ProcessingStats = {
                 detections: 12,
                 matches: 375,
@@ -89,22 +93,22 @@ describe('VideoService', () => {
         });
     });
 
-    describe('#getVideoResult()', () => {
-        it('should fail on not finished requests', () => {
+    describe('#getVideoResult()', function () {
+        it('should fail on not finished requests', function () {
             const response = responseFactory(inProgressStatusResponse) as VideoStatus;
 
             when(getVideoStatus(clientGUID)).thenResolve(response);
             return expect(service.result(clientGUID, 'detect', 1)).to.be.rejectedWith(BadRequestError);
         });
 
-        it('should fail on bad archive numbers', () => {
+        it('should fail on bad archive numbers', function () {
             const response = responseFactory(successfulStatusResponse(0, 0, 0, 0)) as VideoStatus;
 
             when(getVideoStatus(clientGUID)).thenResolve(response);
             return expect(service.result(clientGUID, 'detect', 1)).to.be.rejectedWith(BadRequestError);
         });
 
-        it('should fail on errors', () => {
+        it('should fail on errors', function () {
             when(getVideoStatus(clientGUID)).thenResolve(
                 responseFactory(successfulStatusResponse(1, 1, 1, 1)) as VideoStatus,
             );
@@ -116,7 +120,7 @@ describe('VideoService', () => {
             return expect(service.result(clientGUID, 'detect', 1)).to.be.rejectedWith(FaceXError);
         });
 
-        it('should return empty buffer if there is no archive', () => {
+        it('should return empty buffer if there is no archive', function () {
             when(getVideoStatus(clientGUID)).thenResolve(
                 responseFactory(successfulStatusResponse(1, 1, 1, 1)) as VideoStatus,
             );
@@ -129,7 +133,7 @@ describe('VideoService', () => {
         });
     });
 
-    it('should return non-empty buffer if there is an archive', async () => {
+    it('should return non-empty buffer if there is an archive', async function () {
         const expectedString = 'Test';
 
         when(getVideoStatus(clientGUID)).thenResolve(
