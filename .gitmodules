@@ -1,3 +1,0 @@
-[submodule "src/specs"]
-	path = src/specs
-	url = https://github.com/myrotvorets/api-specs.git
