@@ -8,11 +8,11 @@ import {
     type VideoUploadAck,
     type VideoUploadPriority,
 } from '@myrotvorets/facex';
-import * as td from 'testdouble';
+import { func } from 'testdouble';
 
-export const uploadVideo = td.function<typeof FaceXVideoClient.prototype.uploadVideo>();
-export const getVideoStatus = td.function<typeof FaceXVideoClient.prototype.getVideoStatus>();
-export const getVideoResult = td.function<typeof FaceXVideoClient.prototype.getVideoResult>();
+export const uploadVideo = func<typeof FaceXVideoClient.prototype.uploadVideo>();
+export const getVideoStatus = func<typeof FaceXVideoClient.prototype.getVideoStatus>();
+export const getVideoResult = func<typeof FaceXVideoClient.prototype.getVideoResult>();
 
 export class FakeFaceXVideoClient extends FaceXVideoClient {
     public uploadVideo(video: VideoType, priority?: VideoUploadPriority): Promise<VideoUploadAck> {
