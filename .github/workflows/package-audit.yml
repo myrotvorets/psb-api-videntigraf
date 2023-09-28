@@ -3,6 +3,7 @@ name: Package Audit
 on:
   push:
     branches:
+      - '**'
     paths:
       - package.json
       - package-lock.json
@@ -17,5 +18,14 @@ jobs:
     name: NPM Audit
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          disable-sudo: true
+          allowed-endpoints:
+            api.github.com:443
+            github.com:443
+            registry.npmjs.org:443
+
       - name: Audit with NPM
         uses: myrotvorets/composite-actions/node-package-audit@master
