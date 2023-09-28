@@ -1,7 +1,6 @@
 # psb-api-videntigraf
 
 [![Build and Test](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/ci.yml/badge.svg)](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/ci.yml)
-[![Build and Test](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/ci.yml/badge.svg)](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/ci.yml)
 [![Package Audit](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/package-audit.yml/badge.svg)](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/package-audit.yml)
 [![Dependency Review](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/dependency-review.yml)
 [![CodeQL](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/codeql.yml/badge.svg)](https://github.com/myrotvorets/psb-api-videntigraf/actions/workflows/codeql.yml)
