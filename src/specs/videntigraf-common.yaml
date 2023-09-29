@@ -167,20 +167,20 @@ components:
 
   links:
     status:
-      description: Link to the operation status.
+      description: Get the operation status.
       operationId: getProcessingStatus
       parameters:
         guid: $response.body#/guid
 
     detections:
-      description: Link to the archive with detected faces.
+      description: Get the first archive with detected faces.
       operationId: getDetections
       parameters:
         guid: $request.path.guid
         archive: 1
 
     matches:
-      description: Link to the archive with detected faces.
+      description: Get the first archive with matched faces.
       operationId: getMatches
       parameters:
         guid: $request.path.guid
