@@ -1,4 +1,4 @@
-openapi: '3.1.0'
+openapi: '3.0.3'
 
 info:
   title: VIDentigraF
@@ -41,9 +41,6 @@ paths:
           $ref: "generic-responses.yaml#/components/responses/bad-gateway"
         "200":
           $ref: "videntigraf-common.yaml#/components/responses/successfulUpload"
-      links:
-        status:
-          operationRef: "videntigraf-common.yaml#/components/links/status"
 
   /process/{guid}:
     get:
@@ -70,11 +67,6 @@ paths:
           $ref: "generic-responses.yaml#/components/responses/bad-gateway"
         "200":
           $ref: "videntigraf-common.yaml#/components/responses/processingStatus"
-      links:
-        detections:
-          operationRef: "videntigraf-private.yaml#/components/links/detections"
-        matches:
-          operationRef: "videntigraf-private.yaml#/components/links/matches"
 
   /process/{guid}/detections/{archive}:
     get:

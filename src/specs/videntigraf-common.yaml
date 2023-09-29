@@ -139,6 +139,9 @@ components:
             required:
               - success
               - guid
+      links:
+        status:
+          $ref: "#/components/links/status"
 
     processingStatus:
       description: Video processing status.
@@ -148,6 +151,11 @@ components:
             oneOf:
               - $ref: "#/components/schemas/processed"
               - $ref: "#/components/schemas/processing"
+      links:
+        detections:
+          $ref: "#/components/links/detections"
+        matches:
+          $ref: "#/components/links/matches"
 
     zipArchive:
       description: The requested ZIP archive.
