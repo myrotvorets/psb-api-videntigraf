@@ -1,0 +1,240 @@
+components:
+  responses:
+    error_generic:
+      description: Generic error response
+      content:
+        application/json:
+          example:
+            success: false
+            status: 500
+            code: UNKNOWN_ERROR
+            message: Unknown error
+          schema:
+            type: object
+            properties:
+              success:
+                description: Operation status (failed)
+                type: boolean
+                enum: [false]
+              status:
+                description: HTTP error code
+                type: number
+                minimum: 400
+                maximum: 599
+              code:
+                description: Error code
+                type: string
+              message:
+                description: Error description
+                type: string
+              errors:
+                description: Additional information (typically present for validation errors)
+                type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      description: Place where the error occurred
+                      type: string
+                    message:
+                      description: Detailed description
+                      type: string
+                    error_code:
+                      description: Error code
+                      type: string
+                  required:
+                    - path
+                    - message
+            required:
+              - success
+              - status
+              - code
+              - message
+    not-authorized:
+      description: Not authorized
+      content:
+        application/json:
+          example:
+            success: false
+            status: 401
+            code: AUTHORIZATION_FAILED
+            message: Authorization failed
+          schema:
+            type: object
+            properties:
+              success:
+                description: Marks the operation as failed
+                type: boolean
+                enum: [false]
+              status:
+                description: HTTP status code
+                type: number
+                enum: [401]
+              code:
+                description: |
+                  Error code:
+                    * `UNAUTHORIZED`: the `Authorization` header is misisng
+                    * `AUTHORIZATION_REQUIRED`: the `Authorization` header is missing or the authorization scheme is not supported / unknown
+                    * `AUTHORIZATION_FAILED`: authorization failed
+                type: string
+                enum:
+                  - UNAUTHORIZED
+                  - AUTHORIZATION_REQUIRED
+                  - AUTHORIZATION_FAILED
+              message:
+                description: Error description
+                type: string
+              errors:
+                description: Additional information
+                type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      description: Place where the error occurred
+                      type: string
+                    message:
+                      description: Detailed description
+                      type: string
+                    error_code:
+                      description: Error code
+                      type: string
+                  required:
+                    - path
+                    - message
+            required: 
+              - status
+              - code
+              - message
+
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          example:
+            success: false
+            status: 403
+            code: COUNTRY_BLOCK
+            message: This API is available only in Ukraine
+          schema:
+            type: object
+            properties:
+              success:
+                description: Marks the operation as failed
+                type: boolean
+                enum: [false]
+              status:
+                description: HTTP status code
+                type: number
+                enum: [403]
+              code:
+                description: |
+                  Error code:
+                    * `COUNTRY_BLOCK`: this API cannot be used in this country
+                    * `COUNTRY_BLOCK_RU`: Russia is not welcome here
+                type: string
+              message:
+                description: Error description
+                type: string
+              errors:
+                description: Additional information
+                type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      description: Place where the error occurred
+                      type: string
+                    message:
+                      description: Detailed description
+                      type: string
+                    error_code:
+                      description: Error code
+                      type: string
+                  required:
+                    - path
+                    - message
+            required: 
+              - status
+              - code
+              - message
+
+    rate-limit:
+      description: Too Many Requests
+      content:
+        application/json:
+          example:
+            success: false
+            status: 429
+            code: RATE_LIMIT_EXCEEDED
+            message: Rate limit exceeded
+          schema:
+            type: object
+            properties:
+              success:
+                description: Marks the operation as failed
+                type: boolean
+                enum: [false]
+              status:
+                description: HTTP status code
+                type: number
+                enum: [429]
+              code:
+                description: Error code
+                type: string
+                enum: [RATE_LIMIT_EXCEEDED]
+              message:
+                description: Error description
+                type: string
+            required:
+              - success
+              - status
+              - code
+              - message
+      headers:
+        X-RateLimit-Limit:
+          description: The number of allowed requests in the current period
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: The number of remaining requests in the current period
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          description: The number of seconds left in the current period
+          schema:
+            type: integer
+
+    bad-gateway:
+      description: |
+        Bad gateway: error communicating with the upstream server or unexpected response from the upstream
+      content:
+        application/json:
+          example:
+            success: false
+            status: 502
+            code: BAD_GATEWAY
+            message: Error talking to the upstream server
+          schema:
+            type: object
+            properties:
+              success:
+                description: Marks the operation as failed
+                type: boolean
+                enum: [false]
+              status:
+                description: HTTP status code
+                type: number
+                enum: [502]
+              code:
+                description: Error code
+                type: string
+                enum: [BAD_GATEWAY]
+              message:
+                description: Error description
+                type: string
+            required:
+              - success
+              - status
+              - code
+              - message

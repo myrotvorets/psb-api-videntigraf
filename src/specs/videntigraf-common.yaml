@@ -1,0 +1,179 @@
+components:
+  schemas:
+    success:
+      description: Denotes the successful response.
+      type: boolean
+      enum: [true]
+
+    guid:
+      description: Unique identifier of an operation.
+      type: string
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      example: 5f4f5a5a-5a5a-5a5a-5a5a-5f5f5f5f5f5f
+
+    processing:
+      description: The video is being processed.
+      type: object
+      properties:
+        success:
+          $ref: "#/components/schemas/success"
+        status:
+          description: The status of the operation (`inprogress`).
+          type: string
+          enum: ['inprogress']
+      required:
+        - success
+        - status
+      example:
+        success: true
+        status: inprogress
+
+    processed:
+      description: The video has been processed.
+      type: object
+      properties:
+        success:
+          $ref: "#/components/schemas/success"
+          enum: [true]
+        status:
+          description: The status of the operation (`complete`).
+          type: string
+          enum: ['complete']
+        stats:
+          type: object
+          description: Results statistics.
+          properties:
+            detections:
+              description: Number of faces detected.
+              type: integer
+              format: int32
+              minimum: 0
+            matches:
+              description: Number of faces matched.
+              type: integer
+              format: int32
+              minimum: 0
+            d_archives:
+              description: Number of archives with detected faces.
+              type: integer
+              format: int32
+              minimum: 0
+            m_archives:
+              description: Number of archives with matched faces.
+              type: integer
+              format: int32
+              minimum: 0
+          required:
+            - detections
+            - matches
+            - d_archives
+            - m_archives
+      required:
+        - success
+        - status
+        - stats
+      example:
+        success: true
+        status: complete
+        stats:
+          detections: 10
+          matches: 500
+          d_archives: 1
+          m_archives: 2
+
+  parameters:
+    guid:
+      name: guid
+      description: Operation GUID returned by the [`/process`](#/VIDentigraF%20API/post_process) API.
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/guid"
+
+    archive:
+      name: archive
+      description: Archive number
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        example: 1
+
+  requestBodies:
+    upload:
+      description: Video to be processed.
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              video:
+                type: string
+                format: binary
+            required:
+              - video
+            additionalProperties: false
+          encoding:
+            video:
+              contentType: application/octet-stream, video/*
+
+  responses:
+    successfulUpload:
+      description: The video has been successfully uploaded.
+      content:
+        application/json:
+          example:
+            success: true
+            guid: "00000000-0000-0000-0000-000000000000"
+          schema:
+            type: object
+            description: Response
+            properties:
+              success:
+                $ref: "#/components/schemas/success"
+              guid:
+                $ref: "#/components/schemas/guid"
+            required:
+              - success
+              - guid
+
+    processingStatus:
+      description: Video processing status.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/processed"
+              - $ref: "#/components/schemas/processing"
+
+    zipArchive:
+      description: The requested ZIP archive.
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: byte
+
+  links:
+    status:
+      description: Link to the operation status.
+      operationId: getProcessingStatus
+      parameters:
+        guid: $response.body#/guid
+
+    detections:
+      description: Link to the archive with detected faces.
+      operationId: getDetections
+      parameters:
+        guid: $request.path.guid
+        archive: 1
+
+    matches:
+      description: Link to the archive with detected faces.
+      operationId: getMatches
+      parameters:
+        guid: $request.path.guid
+        archive: 1

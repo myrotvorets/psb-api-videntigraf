@@ -17,11 +17,6 @@ jobs:
           - { name: LTS,     version: lts/* }
     name: Build and test (Node ${{ matrix.node.name }})
     steps:
-      - name: Check out the code
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
-        with:
-          submodules: true
-
       - name: Build and test
         uses: myrotvorets/composite-actions/build-test-nodejs@master
         with:

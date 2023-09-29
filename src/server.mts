@@ -1,7 +1,7 @@
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import express from 'express';
+import express, { type Express, static as staticMiddleware } from 'express';
 import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { cleanUploadedFilesMiddleware } from '@myrotvorets/clean-up-after-multer';
@@ -14,27 +14,38 @@ import { videoController } from './controllers/video.mjs';
 import { monitoringController } from './controllers/monitoring.mjs';
 import { uploadErrorHandlerMiddleware } from './middleware/upload.mjs';
 
-export async function configureApp(app: express.Express): Promise<void> {
+export async function configureApp(app: Express): Promise<void> {
     const env = environment();
+    const base = dirname(fileURLToPath(import.meta.url));
 
-    await installOpenApiValidator(
-        join(dirname(fileURLToPath(import.meta.url)), 'specs', 'videntigraf.yaml'),
-        app,
-        env.NODE_ENV,
-        {
-            fileUploader: {
-                dest: tmpdir(),
-                limits: {
-                    fieldNameSize: 32,
-                    fieldSize: 1024,
-                    fields: 16,
-                    fileSize: env.VIDENTIGRAF_MAX_FILE_SIZE,
-                    files: 1,
-                    headerPairs: 16,
-                },
+    await installOpenApiValidator(join(base, 'specs', 'videntigraf-private.yaml'), app, env.NODE_ENV, {
+        ignorePaths: /^(\/$|\/specs\/)/u,
+        fileUploader: {
+            dest: tmpdir(),
+            limits: {
+                fieldNameSize: 32,
+                fieldSize: 1024,
+                fields: 16,
+                fileSize: env.VIDENTIGRAF_MAX_FILE_SIZE,
+                files: 1,
+                headerPairs: 16,
             },
         },
+    });
+
+    app.use(
+        '/specs/',
+        staticMiddleware(join(base, 'specs'), {
+            acceptRanges: false,
+            index: false,
+        }),
     );
+
+    /* c8 ignore start */
+    if (process.env.HAVE_SWAGGER === 'true') {
+        app.get('/', (_req, res) => res.redirect('/swagger/'));
+    }
+    /* c8 ignore stop */
 
     app.use(
         videoController(),
@@ -46,7 +57,7 @@ export async function configureApp(app: express.Express): Promise<void> {
 }
 
 /* c8 ignore start */
-export function setupApp(): express.Express {
+export function setupApp(): Express {
     const app = express();
     app.set('strict routing', true);
     app.set('x-powered-by', false);
