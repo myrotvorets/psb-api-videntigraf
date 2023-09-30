@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream';
 import type { RawResponse } from '@myrotvorets/facex';
 
 export const fakeFile: Express.Multer.File = {
@@ -6,7 +7,7 @@ export const fakeFile: Express.Multer.File = {
     encoding: 'binary',
     mimetype: 'video/mp4',
     size: 1048576,
-    stream: null,
+    stream: new Readable(),
     destination: '/tmp',
     filename: 'test.mp4',
     path: '',
@@ -113,7 +114,7 @@ export const failedVideoResult: RawResponse = {
         client_id: 'facex/node',
         reqID_serv: '00000000-0000-0000-0000-000000000000',
         reqID_clnt: clientGUID,
-        segment: null,
+        segment: '',
         datetime: Date.now().toString(),
         result_code: -1,
         results_amount: 0,
@@ -130,7 +131,7 @@ export const emptyVideoResult: RawResponse = {
         client_id: 'facex/node',
         reqID_serv: '00000000-0000-0000-0000-000000000000',
         reqID_clnt: clientGUID,
-        segment: null,
+        segment: '',
         datetime: Date.now().toString(),
         result_code: 3,
         results_amount: 0,
@@ -147,7 +148,7 @@ export const successfulVideoResult = (data: string): RawResponse => ({
         client_id: 'facex/node',
         reqID_serv: '00000000-0000-0000-0000-000000000000',
         reqID_clnt: clientGUID,
-        segment: null,
+        segment: '',
         datetime: Date.now().toString(),
         result_code: 3,
         results_amount: 0,
