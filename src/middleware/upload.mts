@@ -26,8 +26,8 @@ export function uploadErrorHandlerMiddleware(err: unknown, _req: Request, _res: 
                 break;
         }
 
-        return next(response);
+        next(response);
+    } else {
+        next(err);
     }
-
-    return next(err);
 }

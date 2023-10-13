@@ -14,7 +14,7 @@ interface UploadResponse {
 function uploadHandler(service: VideoService): RequestHandler {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return async (req: Request, res: Response<UploadResponse>): Promise<void> => {
-        const guid = await service.upload((req.files as Express.Multer.File[])[0]);
+        const guid = await service.upload((req.files as Express.Multer.File[])[0]!);
         res.json({
             success: true,
             guid,

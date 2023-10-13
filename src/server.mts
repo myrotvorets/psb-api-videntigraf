@@ -42,7 +42,7 @@ export async function configureApp(app: Express): Promise<void> {
     );
 
     /* c8 ignore start */
-    if (process.env.HAVE_SWAGGER === 'true') {
+    if (process.env['HAVE_SWAGGER'] === 'true') {
         app.get('/', (_req, res) => res.redirect('/swagger/'));
     }
     /* c8 ignore stop */

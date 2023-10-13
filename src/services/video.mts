@@ -39,10 +39,10 @@ export class VideoService {
 
         const attrs = response.attributes();
         return {
-            detections: +attrs.d || 0,
-            matches: +attrs.m || 0,
-            d_archives: +attrs.d_arx || 0,
-            m_archives: +attrs.m_arx || 0,
+            detections: +(attrs['d'] ?? 0),
+            matches: +(attrs['m'] ?? 0),
+            d_archives: +(attrs['d_arx'] ?? 0),
+            m_archives: +(attrs['m_arx'] ?? 0),
         };
     }
 
