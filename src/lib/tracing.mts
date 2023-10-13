@@ -1,15 +1,9 @@
 /* c8 ignore start */
-import { OpenTelemetryConfigurator } from '@myrotvorets/opentelemetry-configurator';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
-
-if (!+(process.env.ENABLE_TRACING || 0)) {
-    process.env.OTEL_SDK_DISABLED = 'true';
-}
+import { OpenTelemetryConfigurator, getExpressInstrumentations } from '@myrotvorets/opentelemetry-configurator';
 
 const configurator = new OpenTelemetryConfigurator({
     serviceName: 'psb-api-videntigraf',
-    instrumentations: [new ExpressInstrumentation(), new HttpInstrumentation()],
+    instrumentations: [...getExpressInstrumentations()],
 });
 
 configurator.start();

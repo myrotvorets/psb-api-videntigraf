@@ -8,31 +8,35 @@ import { BadRequestError } from '../lib/badrequesterror.mjs';
 export function faceXErrorHandlerMiddleware(err: unknown, req: Request, res: Response, next: NextFunction): void {
     if (err && typeof err === 'object') {
         if (err instanceof UploadError) {
-            return next({
+            next({
                 success: false,
                 status: 400,
                 code: 'UPLOAD_FAILED',
                 message: `${err.message} (${err.file})`,
             });
+            return;
         }
 
         if (err instanceof HttpError || err instanceof NetworkError || err instanceof BadResponseError) {
-            return next(badGatewayFromError(err));
+            next(badGatewayFromError(err));
+            return;
         }
 
         if (err instanceof BadRequestError) {
-            return next({
+            next({
                 success: false,
                 status: 400,
                 code: 'BAD_REQUEST',
                 message: `${err.message}`,
             });
+            return;
         }
 
         if (err instanceof FaceXError) {
-            return next(errorResponseFromFaceXError(err));
+            next(errorResponseFromFaceXError(err));
+            return;
         }
     }
 
-    return next(err);
+    next(err);
 }

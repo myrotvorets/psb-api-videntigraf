@@ -15,15 +15,15 @@ export const getVideoStatus = func<typeof FaceXVideoClient.prototype.getVideoSta
 export const getVideoResult = func<typeof FaceXVideoClient.prototype.getVideoResult>();
 
 export class FakeFaceXVideoClient extends FaceXVideoClient {
-    public uploadVideo(video: VideoType, priority?: VideoUploadPriority): Promise<VideoUploadAck> {
+    public override uploadVideo(video: VideoType, priority?: VideoUploadPriority): Promise<VideoUploadAck> {
         return uploadVideo(video, priority);
     }
 
-    public getVideoStatus(guid: string): Promise<VideoStatus> {
+    public override getVideoStatus(guid: string): Promise<VideoStatus> {
         return getVideoStatus(guid);
     }
 
-    public getVideoResult(guid: string, type: VideoResultType, archiveNumber?: number): Promise<VideoResult> {
+    public override getVideoResult(guid: string, type: VideoResultType, archiveNumber?: number): Promise<VideoResult> {
         return getVideoResult(guid, type, archiveNumber);
     }
 }
