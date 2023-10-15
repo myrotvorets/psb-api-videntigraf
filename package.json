@@ -21,7 +21,7 @@
     "@myrotvorets/create-server": "^2.2.0",
     "@myrotvorets/envalidators": "^2.1.0",
     "@myrotvorets/express-async-middleware-wrapper": "^2.2.0",
-    "@myrotvorets/express-microservice-middlewares": "^1.6.0",
+    "@myrotvorets/express-microservice-middlewares": "^2.0.0",
     "@myrotvorets/facex": "^2.6.1",
     "@myrotvorets/oav-installer": "^4.1.0",
     "@myrotvorets/opentelemetry-configurator": "^6.4.1",
