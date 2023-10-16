@@ -24,7 +24,7 @@
     "@myrotvorets/express-microservice-middlewares": "^2.0.0",
     "@myrotvorets/facex": "^2.6.1",
     "@myrotvorets/oav-installer": "^4.1.0",
-    "@myrotvorets/opentelemetry-configurator": "^6.4.1",
+    "@myrotvorets/opentelemetry-configurator": "^7.0.0",
     "envalid": "^8.0.0",
     "express": "^4.18.2",
     "express-openapi-validator": "^5.0.6",
