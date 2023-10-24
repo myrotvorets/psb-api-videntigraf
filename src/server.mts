@@ -7,7 +7,7 @@ import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-micros
 import { cleanUploadedFilesMiddleware } from '@myrotvorets/clean-up-after-multer';
 import { createServer, getTracer, recordErrorToSpan } from '@myrotvorets/otel-utils';
 
-import { initializeContainer } from './lib/container.mjs';
+import { initializeContainer, scopedContainerMiddleware } from './lib/container.mjs';
 import { requestDurationMiddleware } from './middleware/duration.mjs';
 import { loggerMiddleware } from './middleware/logger.mjs';
 import { uploadErrorHandlerMiddleware } from './middleware/upload.mjs';
@@ -24,7 +24,7 @@ export async function configureApp(app: Express): Promise<ReturnType<typeof init
                 const env = container.resolve('environment');
                 const base = dirname(fileURLToPath(import.meta.url));
 
-                app.use(requestDurationMiddleware, loggerMiddleware);
+                app.use(requestDurationMiddleware, scopedContainerMiddleware, loggerMiddleware);
                 app.use('/monitoring', monitoringController());
 
                 await installOpenApiValidator(join(base, 'specs', 'videntigraf-private.yaml'), app, env.NODE_ENV, {

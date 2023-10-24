@@ -63,7 +63,6 @@ export function initializeContainer(): typeof container {
     return container;
 }
 
-/* c8 ignore start */
 export function scopedContainerMiddleware(
     req: Request,
     res: Response<unknown, LocalsWithContainer>,
@@ -80,4 +79,3 @@ export function scopedContainerMiddleware(
 
     next();
 }
-/* c8 ignore stop */
