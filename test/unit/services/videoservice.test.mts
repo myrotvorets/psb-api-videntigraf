@@ -9,7 +9,7 @@ import {
     type VideoUploadPriority,
     responseFactory,
 } from '@myrotvorets/facex';
-import { type ProcessingStats, VideoService } from '../../../src/services/video.mjs';
+import { type ProcessingStats, VideoService } from '../../../src/services/videoservice.mjs';
 import { UploadError } from '../../../src/lib/uploaderror.mjs';
 import { BadRequestError } from '../../../src/lib/badrequesterror.mjs';
 import { FakeFaceXVideoClient, getVideoResult, getVideoStatus, uploadVideo } from './fakeclient.mjs';

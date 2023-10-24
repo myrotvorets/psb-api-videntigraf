@@ -1,84 +1,85 @@
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import express, { type Express, static as staticMiddleware } from 'express';
+import express, { type Express } from 'express';
 import { installOpenApiValidator } from '@myrotvorets/oav-installer';
 import { errorMiddleware, notFoundMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { cleanUploadedFilesMiddleware } from '@myrotvorets/clean-up-after-multer';
-import { createServer } from '@myrotvorets/create-server';
-import morgan from 'morgan';
+import { createServer, getTracer, recordErrorToSpan } from '@myrotvorets/otel-utils';
 
-import { environment } from './lib/environment.mjs';
+import { initializeContainer } from './lib/container.mjs';
+import { requestDurationMiddleware } from './middleware/duration.mjs';
+import { loggerMiddleware } from './middleware/logger.mjs';
+import { uploadErrorHandlerMiddleware } from './middleware/upload.mjs';
 
 import { videoController } from './controllers/video.mjs';
 import { monitoringController } from './controllers/monitoring.mjs';
-import { uploadErrorHandlerMiddleware } from './middleware/upload.mjs';
 
-export async function configureApp(app: Express): Promise<void> {
-    const env = environment();
-    const base = dirname(fileURLToPath(import.meta.url));
+export async function configureApp(app: Express): Promise<ReturnType<typeof initializeContainer>> {
+    return getTracer().startActiveSpan(
+        'configureApp',
+        async (span): Promise<ReturnType<typeof initializeContainer>> => {
+            try {
+                const container = initializeContainer();
+                const env = container.resolve('environment');
+                const base = dirname(fileURLToPath(import.meta.url));
 
-    await installOpenApiValidator(join(base, 'specs', 'videntigraf-private.yaml'), app, env.NODE_ENV, {
-        ignorePaths: /^(\/$|\/specs\/)/u,
-        fileUploader: {
-            dest: tmpdir(),
-            limits: {
-                fieldNameSize: 32,
-                fieldSize: 1024,
-                fields: 16,
-                fileSize: env.VIDENTIGRAF_MAX_FILE_SIZE,
-                files: 1,
-                headerPairs: 16,
-            },
+                app.use(requestDurationMiddleware, loggerMiddleware);
+                app.use('/monitoring', monitoringController());
+
+                await installOpenApiValidator(join(base, 'specs', 'videntigraf-private.yaml'), app, env.NODE_ENV, {
+                    fileUploader: {
+                        dest: tmpdir(),
+                        limits: {
+                            fieldNameSize: 32,
+                            fieldSize: 1024,
+                            fields: 16,
+                            fileSize: env.VIDENTIGRAF_MAX_FILE_SIZE,
+                            files: 1,
+                            headerPairs: 16,
+                        },
+                    },
+                });
+
+                app.use(
+                    videoController(),
+                    notFoundMiddleware,
+                    cleanUploadedFilesMiddleware(),
+                    uploadErrorHandlerMiddleware,
+                    errorMiddleware,
+                );
+
+                return container;
+            } /* c8 ignore start */ catch (e) {
+                recordErrorToSpan(e, span);
+                throw e;
+            } /* c8 ignore stop */ finally {
+                span.end();
+            }
         },
-    });
-
-    app.use(
-        '/specs/',
-        staticMiddleware(join(base, 'specs'), {
-            acceptRanges: false,
-            index: false,
-        }),
-    );
-
-    /* c8 ignore start */
-    if (process.env['HAVE_SWAGGER'] === 'true') {
-        app.get('/', (_req, res) => res.redirect('/swagger/'));
-    }
-    /* c8 ignore stop */
-
-    app.use(
-        videoController(),
-        notFoundMiddleware,
-        cleanUploadedFilesMiddleware(),
-        uploadErrorHandlerMiddleware,
-        errorMiddleware,
     );
 }
 
-/* c8 ignore start */
-export function setupApp(): Express {
+export function createApp(): Express {
     const app = express();
     app.set('strict routing', true);
+    app.set('case sensitive routing', true);
     app.set('x-powered-by', false);
-
-    app.use(
-        morgan(
-            '[PSBAPI-videntigraf] :req[X-Request-ID]\t:method\t:url\t:req[content-length]\t:status :res[content-length]\t:date[iso]\t:response-time\t:total-time',
-        ),
-    );
-
+    app.set('trust proxy', true);
     return app;
 }
 
+/* c8 ignore start */
 export async function run(): Promise<void> {
-    const [env, app] = [environment(), setupApp()];
-
-    app.use('/monitoring', monitoringController());
-
-    await configureApp(app);
+    const app = createApp();
+    const container = await configureApp(app);
+    const env = container.resolve('environment');
 
     const server = await createServer(app);
     server.listen(env.PORT);
+
+    process.on('beforeExit', () => {
+        container.dispose().catch((e) => console.error(e));
+    });
 }
 /* c8 ignore end */

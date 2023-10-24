@@ -1,25 +1,22 @@
 import { asyncWrapperMiddleware } from '@myrotvorets/express-async-middleware-wrapper';
-import { FaceXVideoClient } from '@myrotvorets/facex';
 import { type Request, type RequestHandler, type Response, Router } from 'express';
-import { environment } from '../lib/environment.mjs';
+import { numberParamHandler } from '@myrotvorets/express-microservice-middlewares';
 import { faceXErrorHandlerMiddleware } from '../middleware/error.mjs';
 import { uploadErrorHandlerMiddleware } from '../middleware/upload.mjs';
-import { VideoService } from '../services/video.mjs';
+import { LocalsWithContainer } from '../lib/container.mjs';
 
 interface UploadResponse {
     success: true;
     guid: string;
 }
 
-function uploadHandler(service: VideoService): RequestHandler {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    return async (req: Request, res: Response<UploadResponse>): Promise<void> => {
-        const guid = await service.upload((req.files as Express.Multer.File[])[0]!);
-        res.json({
-            success: true,
-            guid,
-        });
-    };
+async function uploadHandler(req: Request, res: Response<UploadResponse, LocalsWithContainer>): Promise<void> {
+    const service = res.locals.container.resolve('videoService');
+    const guid = await service.upload((req.files as Express.Multer.File[])[0]!);
+    res.json({
+        success: true,
+        guid,
+    });
 }
 
 interface GuidParams extends Record<string, string | number> {
@@ -46,55 +43,49 @@ type StatusResponse =
           };
       };
 
-function statusHandler(service: VideoService): RequestHandler<GuidParams> {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    return async (req: Request<GuidParams>, res: Response<StatusResponse>): Promise<void> => {
-        const { guid } = req.params;
-        const result = await service.status(guid);
-        if (false === result) {
-            res.json({ success: true, status: 'inprogress' });
-        } else {
-            res.json({ success: true, status: 'complete', stats: result });
-        }
-    };
+async function statusHandler(
+    req: Request<GuidParams>,
+    res: Response<StatusResponse, LocalsWithContainer>,
+): Promise<void> {
+    const { guid } = req.params;
+    const service = res.locals.container.resolve('videoService');
+    const result = await service.status(guid);
+    if (false === result) {
+        res.json({ success: true, status: 'inprogress' });
+    } else {
+        res.json({ success: true, status: 'complete', stats: result });
+    }
 }
 
-function resultHandler(service: VideoService, what: 'detect' | 'match'): RequestHandler<GuidWithArchiveParams> {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    return async (req: Request<GuidWithArchiveParams>, res: Response<Buffer>): Promise<void> => {
-        const { guid, archive } = req.params;
-        const result = await service.result(guid, what, archive);
-        if (!result.length) {
-            res.status(204).end();
-        } else {
-            res.set('Content-Type', 'application/zip');
-            res.send(result);
-        }
-    };
+function resultHandler(
+    what: 'detect' | 'match',
+): RequestHandler<GuidWithArchiveParams, Buffer, never, never, LocalsWithContainer> {
+    return asyncWrapperMiddleware(
+        async (
+            req: Request<GuidWithArchiveParams, Buffer, never, never, LocalsWithContainer>,
+            res: Response<Buffer, LocalsWithContainer>,
+        ): Promise<void> => {
+            const { guid, archive } = req.params;
+            const service = res.locals.container.resolve('videoService');
+            const result = await service.result(guid, what, archive);
+            if (!result.length) {
+                res.status(204).end();
+            } else {
+                res.set('Content-Type', 'application/zip');
+                res.send(result);
+            }
+        },
+    );
 }
 
 export function videoController(): Router {
-    const env = environment();
-
     const router = Router();
-    const client = new FaceXVideoClient(env.FACEX_URL, 'facex/node-2.0');
-    const service = new VideoService(client);
+    router.param('archive', numberParamHandler);
 
-    router.post('/process', asyncWrapperMiddleware(uploadHandler(service)));
-    router.get(
-        '/process/:guid([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})',
-        asyncWrapperMiddleware(statusHandler(service)),
-    );
-
-    router.get(
-        '/process/:guid([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/detections/:archive(\\d+)',
-        asyncWrapperMiddleware(resultHandler(service, 'detect')),
-    );
-
-    router.get(
-        '/process/:guid([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/matches/:archive(\\d+)',
-        asyncWrapperMiddleware(resultHandler(service, 'match')),
-    );
+    router.post('/process', asyncWrapperMiddleware(uploadHandler));
+    router.get('/process/:guid', asyncWrapperMiddleware(statusHandler));
+    router.get('/process/:guid/detections/:archive', resultHandler('detect'));
+    router.get('/process/:guid/matches/:archive', resultHandler('match'));
 
     router.use(uploadErrorHandlerMiddleware);
     router.use(faceXErrorHandlerMiddleware);

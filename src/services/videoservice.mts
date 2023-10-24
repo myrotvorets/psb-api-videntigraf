@@ -2,15 +2,11 @@ import { createReadStream } from 'node:fs';
 import { FaceXError, FaceXVideoClient, VideoUploadAck } from '@myrotvorets/facex';
 import { UploadError } from '../lib/uploaderror.mjs';
 import { BadRequestError } from '../lib/badrequesterror.mjs';
+import { type ProcessingStats, VideoServiceInterface } from './videoserviceinterface.mjs';
 
-export interface ProcessingStats {
-    detections: number;
-    matches: number;
-    d_archives: number;
-    m_archives: number;
-}
+export type { ProcessingStats };
 
-export class VideoService {
+export class VideoService implements VideoServiceInterface {
     private readonly client: FaceXVideoClient;
 
     public constructor(client: FaceXVideoClient) {
