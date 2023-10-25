@@ -21,7 +21,7 @@
     "@myrotvorets/clean-up-after-multer": "^1.1.7",
     "@myrotvorets/envalidators": "^2.1.0",
     "@myrotvorets/express-async-middleware-wrapper": "^2.2.0",
-    "@myrotvorets/express-microservice-middlewares": "^2.1.0",
+    "@myrotvorets/express-microservice-middlewares": "^2.2.0",
     "@myrotvorets/express-request-logger": "^1.2.0",
     "@myrotvorets/facex": "^2.6.1",
     "@myrotvorets/oav-installer": "^4.1.1",
