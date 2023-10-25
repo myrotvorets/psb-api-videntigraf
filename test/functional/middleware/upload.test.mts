@@ -1,34 +1,16 @@
 import { expect } from 'chai';
-import express, { type Express, type NextFunction } from 'express';
+import type { Express, NextFunction } from 'express';
 import request from 'supertest';
 import { errorMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { type ErrorCode, MulterError } from 'multer';
 import { uploadErrorHandlerMiddleware } from '../../../src/middleware/upload.mjs';
-import { environment } from '../../../src/lib/environment.mjs';
+import { createApp } from '../../../src/server.mjs';
 
 describe('uploadErrorHandlerMiddleware', function () {
     let app: Express;
-    let env: typeof process.env;
-
-    before(function () {
-        env = { ...process.env };
-    });
 
     beforeEach(function () {
-        process.env = {
-            NODE_ENV: 'test',
-            PORT: '3030',
-            FACEX_URL: 'https://example.com',
-        };
-
-        environment();
-
-        app = express();
-        app.disable('x-powered-by');
-    });
-
-    afterEach(function () {
-        process.env = { ...env };
+        app = createApp();
     });
 
     it('should not modify non-multer errors', function () {

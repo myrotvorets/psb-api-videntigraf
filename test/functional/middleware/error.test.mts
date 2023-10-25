@@ -1,36 +1,18 @@
 import { expect } from 'chai';
-import express, { type Express, type NextFunction } from 'express';
+import type { Express, NextFunction } from 'express';
 import request from 'supertest';
 import { errorMiddleware } from '@myrotvorets/express-microservice-middlewares';
 import { BadResponseError, FaceXError, HttpError, NetworkError } from '@myrotvorets/facex';
 import { BadRequestError } from '../../../src/lib/badrequesterror.mjs';
-import { environment } from '../../../src/lib/environment.mjs';
 import { UploadError } from '../../../src/lib/uploaderror.mjs';
 import { faceXErrorHandlerMiddleware } from '../../../src/middleware/error.mjs';
+import { createApp } from '../../../src/server.mjs';
 
 describe('faceXErrorHandlerMiddleware', function () {
     let app: Express;
-    let env: typeof process.env;
-
-    before(function () {
-        env = { ...process.env };
-    });
 
     beforeEach(function () {
-        process.env = {
-            NODE_ENV: 'test',
-            PORT: '3030',
-            FACEX_URL: 'https://example.com',
-        };
-
-        environment();
-
-        app = express();
-        app.disable('x-powered-by');
-    });
-
-    afterEach(function () {
-        process.env = { ...env };
+        app = createApp();
     });
 
     const expectError = (res: request.Response, code: string, status: number): unknown =>
@@ -69,21 +51,21 @@ describe('faceXErrorHandlerMiddleware', function () {
         );
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
-        return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
+        return request(app).get('/').expect(500).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
     it('should catch FaceX NetworkError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new NetworkError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
-        return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
+        return request(app).get('/').expect(500).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
     it('should catch FaceX BadResponseError', function () {
         app.use('/', (_req, _res, next: NextFunction) => next(new BadResponseError('Boom-boom bye-bye')));
         app.use(faceXErrorHandlerMiddleware);
         app.use(errorMiddleware);
-        return request(app).get('/').expect(502).expect('Content-Type', /json/u).expect(expectBadGateway);
+        return request(app).get('/').expect(500).expect('Content-Type', /json/u).expect(expectBadGateway);
     });
 
     it('should catch BadRequestError', function () {
@@ -103,7 +85,7 @@ describe('faceXErrorHandlerMiddleware', function () {
         app.use(errorMiddleware);
         return request(app)
             .get('/')
-            .expect(502)
+            .expect(500)
             .expect('Content-Type', /json/u)
             .expect((res) => expectError(res, 'FACEX_ERROR', 502));
     });
