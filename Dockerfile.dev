@@ -1,8 +1,0 @@
-FROM myrotvorets/node:latest@sha256:c74b0b0bd9fac428732148017b337ed9560ad998c514aa0ed8bedf1548800df7
-USER root
-WORKDIR /srv/service
-RUN apk add --no-cache vips-dev
-COPY ./package.json ./package-lock.json .npmrc .npmrc* ./
-RUN npm ci --userconfig .npmrc.local
-COPY . .
-ENTRYPOINT ["/usr/bin/npm", "run", "start:dev"]
