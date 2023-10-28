@@ -15,11 +15,6 @@ describe('Container', function () {
             expect(container.resolve('faceXClient')).to.be.an('object').that.is.instanceOf(FaceXVideoClient);
             expect(container.resolve('videoService')).to.be.an('object').that.is.instanceOf(VideoService);
 
-            expect(container.resolve('meter'))
-                .to.be.an('object')
-                .that.has.property('createCounter')
-                .that.is.a('function');
-
             expect(container.resolve('environment'))
                 .to.be.an('object')
                 .that.has.property('NODE_ENV')

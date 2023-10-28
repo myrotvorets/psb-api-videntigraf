@@ -1,6 +1,6 @@
 import { AwilixContainer, asFunction, asValue, createContainer } from 'awilix';
 import type { NextFunction, Request, Response } from 'express';
-import { type Logger, type Meter, getLogger, getMeter } from '@myrotvorets/otel-utils';
+import { type Logger, getLogger } from '@myrotvorets/otel-utils';
 import { FaceXVideoClient } from '@myrotvorets/facex';
 import { environment } from './environment.mjs';
 import { VideoService } from '../services/videoservice.mjs';
@@ -8,7 +8,6 @@ import { VideoService } from '../services/videoservice.mjs';
 export interface Container {
     environment: ReturnType<typeof environment>;
     logger: Logger;
-    meter: Meter;
     faceXClient: FaceXVideoClient;
     videoService: VideoService;
 }
@@ -37,10 +36,6 @@ function createLogger({ req }: Partial<RequestContainer>): Logger {
 }
 /* c8 ignore stop */
 
-function createMeter(): Meter {
-    return getMeter();
-}
-
 function createFaceXVideoClient({ environment }: Container): FaceXVideoClient {
     return new FaceXVideoClient(environment.FACEX_URL, 'facex/node-2.0');
 }
@@ -54,7 +49,6 @@ export function initializeContainer(): typeof container {
     container.register({
         environment: asValue(env),
         logger: asFunction(createLogger).scoped(),
-        meter: asFunction(createMeter).singleton(),
         faceXClient: asFunction(createFaceXVideoClient).singleton(),
         videoService: asFunction(createVideoService).singleton(),
     });
