@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this */
+import { mock } from 'node:test';
 import {
     FaceXVideoClient,
     type VideoResult,
@@ -8,22 +8,21 @@ import {
     type VideoUploadAck,
     type VideoUploadPriority,
 } from '@myrotvorets/facex';
-import { func } from 'testdouble';
 
-export const uploadVideo = func<typeof FaceXVideoClient.prototype.uploadVideo>();
-export const getVideoStatus = func<typeof FaceXVideoClient.prototype.getVideoStatus>();
-export const getVideoResult = func<typeof FaceXVideoClient.prototype.getVideoResult>();
+export const uploadVideoMock = mock.fn<typeof FaceXVideoClient.prototype.uploadVideo>();
+export const getVideoStatusMock = mock.fn<typeof FaceXVideoClient.prototype.getVideoStatus>();
+export const getVideoResultMock = mock.fn<typeof FaceXVideoClient.prototype.getVideoResult>();
 
 export class FakeFaceXVideoClient extends FaceXVideoClient {
     public override uploadVideo(video: VideoType, priority?: VideoUploadPriority): Promise<VideoUploadAck> {
-        return uploadVideo(video, priority);
+        return uploadVideoMock(video, priority);
     }
 
     public override getVideoStatus(guid: string): Promise<VideoStatus> {
-        return getVideoStatus(guid);
+        return getVideoStatusMock(guid);
     }
 
     public override getVideoResult(guid: string, type: VideoResultType, archiveNumber?: number): Promise<VideoResult> {
-        return getVideoResult(guid, type, archiveNumber);
+        return getVideoResultMock(guid, type, archiveNumber);
     }
 }
