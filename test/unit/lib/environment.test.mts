@@ -21,11 +21,11 @@ describe('environment', function () {
         };
 
         process.env = {
-            NODE_ENV: `${expected.NODE_ENV}`,
+            NODE_ENV: expected.NODE_ENV,
             PORT: `${expected.PORT}`,
             EXTRA: 'xxx',
             VIDENTIGRAF_MAX_FILE_SIZE: `${expected.VIDENTIGRAF_MAX_FILE_SIZE}`,
-            FACEX_URL: `${expected.FACEX_URL}`,
+            FACEX_URL: expected.FACEX_URL,
         };
 
         const actual = { ...environment(true) };
@@ -41,10 +41,10 @@ describe('environment', function () {
         };
 
         process.env = {
-            NODE_ENV: `${expected.NODE_ENV}`,
+            NODE_ENV: expected.NODE_ENV,
             PORT: `${expected.PORT}`,
             VIDENTIGRAF_MAX_FILE_SIZE: `${expected.VIDENTIGRAF_MAX_FILE_SIZE}`,
-            FACEX_URL: `${expected.FACEX_URL}`,
+            FACEX_URL: expected.FACEX_URL,
         };
 
         let actual = { ...environment(true) };
@@ -54,7 +54,7 @@ describe('environment', function () {
             NODE_ENV: `${expected.NODE_ENV}${expected.NODE_ENV}`,
             PORT: `1${expected.PORT}`,
             VIDENTIGRAF_MAX_FILE_SIZE: `${expected.VIDENTIGRAF_MAX_FILE_SIZE}`,
-            FACEX_URL: `${expected.FACEX_URL}`,
+            FACEX_URL: expected.FACEX_URL,
         };
 
         actual = { ...environment() };
