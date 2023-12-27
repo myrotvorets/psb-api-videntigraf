@@ -27,7 +27,7 @@ export function faceXErrorHandlerMiddleware(err: unknown, req: Request, res: Res
                 success: false,
                 status: 400,
                 code: 'BAD_REQUEST',
-                message: `${err.message}`,
+                message: err.message,
             });
             return;
         }
