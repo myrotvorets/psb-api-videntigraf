@@ -1,33 +1,29 @@
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
-import type { ErrorResponse } from '@myrotvorets/express-microservice-middlewares';
+import { ApiError } from '@myrotvorets/express-microservice-middlewares';
+import { cleanupFilesAfterMulter } from '@myrotvorets/clean-up-after-multer';
 
-export function uploadErrorHandlerMiddleware(err: unknown, _req: Request, _res: Response, next: NextFunction): void {
-    if (err && typeof err === 'object' && err instanceof MulterError) {
-        const response: ErrorResponse = {
-            success: false,
-            status: 400,
-            code: 'BAD_REQUEST',
-            message: err.message,
-        };
+const errorLookupTable: Record<string, string> = {
+    LIMIT_PART_COUNT: 'UPLOAD_LIMIT_PART_COUNT',
+    LIMIT_FILE_SIZE: 'UPLOAD_LIMIT_FILE_SIZE',
+    LIMIT_FILE_COUNT: 'UPLOAD_LIMIT_FILE_COUNT',
+    LIMIT_FIELD_KEY: 'UPLOAD_LIMIT_FIELD_KEY',
+    LIMIT_FIELD_VALUE: 'UPLOAD_LIMIT_FIELD_VALUE',
+    LIMIT_FIELD_COUNT: 'UPLOAD_LIMIT_FIELD_COUNT',
+    LIMIT_UNEXPECTED_FILE: 'UPLOAD_LIMIT_UNEXPECTED_FILE',
+};
 
-        switch (err.code) {
-            case 'LIMIT_PART_COUNT':
-            case 'LIMIT_FILE_SIZE':
-            case 'LIMIT_FILE_COUNT':
-            case 'LIMIT_FIELD_KEY':
-            case 'LIMIT_FIELD_VALUE':
-            case 'LIMIT_FIELD_COUNT':
-            case 'LIMIT_UNEXPECTED_FILE':
-                response.code = `UPLOAD_${err.code}`;
-                break;
+export function uploadErrorHandlerMiddleware(err: unknown, req: Request, _res: Response, next: NextFunction): void {
+    // eslint-disable-next-line promise/no-promise-in-callback
+    cleanupFilesAfterMulter(req)
+        .then(() => {
+            if (err && typeof err === 'object' && err instanceof MulterError) {
+                err = new ApiError(400, errorLookupTable[err.code] ?? 'BAD_REQUEST', err.message, {
+                    cause: err,
+                });
+            }
 
-            default:
-                break;
-        }
-
-        next(response);
-    } else {
-        next(err);
-    }
+            process.nextTick(next, err);
+        })
+        .catch((e) => process.nextTick(next, e));
 }

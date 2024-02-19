@@ -43,7 +43,7 @@ export function configureApp(app: Express): ReturnType<typeof initializeContaine
                 notFoundMiddleware,
                 cleanUploadedFilesMiddleware(),
                 uploadErrorHandlerMiddleware,
-                errorMiddleware,
+                errorMiddleware(),
             );
 
             return container;
