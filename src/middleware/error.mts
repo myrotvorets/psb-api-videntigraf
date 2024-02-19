@@ -1,19 +1,13 @@
 import type { NextFunction, Request, Response } from 'express';
-import { badGatewayFromError } from '@myrotvorets/express-microservice-middlewares';
+import { ApiError, badGatewayFromError } from '@myrotvorets/express-microservice-middlewares';
 import { BadResponseError, FaceXError, HttpError, NetworkError } from '@myrotvorets/facex';
 import { UploadError } from '../lib/uploaderror.mjs';
-import { errorResponseFromFaceXError } from '../lib/facexerror.mjs';
 import { BadRequestError } from '../lib/badrequesterror.mjs';
 
 export function faceXErrorHandlerMiddleware(err: unknown, req: Request, res: Response, next: NextFunction): void {
     if (err && typeof err === 'object') {
         if (err instanceof UploadError) {
-            next({
-                success: false,
-                status: 400,
-                code: 'UPLOAD_FAILED',
-                message: `${err.message} (${err.file})`,
-            });
+            next(new ApiError(400, 'UPLOAD_FAILED', `${err.message} (${err.file})`, { cause: err }));
             return;
         }
 
@@ -23,17 +17,12 @@ export function faceXErrorHandlerMiddleware(err: unknown, req: Request, res: Res
         }
 
         if (err instanceof BadRequestError) {
-            next({
-                success: false,
-                status: 400,
-                code: 'BAD_REQUEST',
-                message: err.message,
-            });
+            next(new ApiError(400, 'BAD_REQUEST', err.message, { cause: err }));
             return;
         }
 
         if (err instanceof FaceXError) {
-            next(errorResponseFromFaceXError(err));
+            next(new ApiError(502, 'FACEX_ERROR', err.message, { cause: err }));
             return;
         }
     }
