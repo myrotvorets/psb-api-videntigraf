@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { FaceXError, type VideoStatus, type VideoUploadAck, responseFactory } from '@myrotvorets/facex';
+import { FaceXError, VideoResult, type VideoStatus, type VideoUploadAck, responseFactory } from '@myrotvorets/facex';
 import { type ProcessingStats, VideoService } from '../../../src/services/videoservice.mjs';
 import { UploadError } from '../../../src/lib/uploaderror.mjs';
 import { BadRequestError } from '../../../src/lib/badrequesterror.mjs';
@@ -91,20 +91,24 @@ describe('VideoService', function () {
 
         it('should fail on errors', function () {
             getVideoStatusMock.mock.mockImplementationOnce(() =>
-                Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1))),
+                Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1)) as VideoStatus),
             );
 
-            getVideoResultMock.mock.mockImplementationOnce(() => Promise.resolve(responseFactory(failedVideoResult)));
+            getVideoResultMock.mock.mockImplementationOnce(() =>
+                Promise.resolve(responseFactory(failedVideoResult) as VideoResult),
+            );
 
             return expect(service.result(clientGUID, 'detect', 1)).to.be.rejectedWith(FaceXError);
         });
 
         it('should return empty buffer if there is no archive', function () {
             getVideoStatusMock.mock.mockImplementationOnce(() =>
-                Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1))),
+                Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1)) as VideoStatus),
             );
 
-            getVideoResultMock.mock.mockImplementationOnce(() => Promise.resolve(responseFactory(emptyVideoResult)));
+            getVideoResultMock.mock.mockImplementationOnce(() =>
+                Promise.resolve(responseFactory(emptyVideoResult) as VideoResult),
+            );
 
             return expect(service.result(clientGUID, 'detect', 1))
                 .to.eventually.be.instanceOf(Buffer)
@@ -115,11 +119,11 @@ describe('VideoService', function () {
     it('should return non-empty buffer if there is an archive', async function () {
         const expectedString = 'Test';
         getVideoStatusMock.mock.mockImplementationOnce(() =>
-            Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1))),
+            Promise.resolve(responseFactory(successfulStatusResponse(1, 1, 1, 1)) as VideoStatus),
         );
 
         getVideoResultMock.mock.mockImplementationOnce(() =>
-            Promise.resolve(responseFactory(successfulVideoResult(expectedString))),
+            Promise.resolve(responseFactory(successfulVideoResult(expectedString)) as VideoResult),
         );
 
         const result = await service.result(clientGUID, 'match', 1);
