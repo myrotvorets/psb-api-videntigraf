@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/assertions-in-tests */
 import express, { type Express } from 'express';
 import { expect } from 'chai';
 import request from 'supertest';
@@ -13,6 +14,7 @@ describe('MonitoringController', function () {
     });
 
     beforeEach(function () {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- false positive
         expect(healthChecker).not.to.be.undefined;
         healthChecker!.shutdownRequested = false;
     });
