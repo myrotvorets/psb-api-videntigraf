@@ -47,7 +47,7 @@
     "chai": "^5.2.1",
     "chai-as-promised": "npm:@rvagg/chai-as-promised@^8.0.2",
     "eslint-formatter-gha": "^1.6.0",
-    "eslint-plugin-mocha": "^10.5.0",
+    "eslint-plugin-mocha": "^11.1.0",
     "mocha": "^11.1.0",
     "mocha-multi": "^1.1.7",
     "mocha-reporter-gha": "^1.1.1",
