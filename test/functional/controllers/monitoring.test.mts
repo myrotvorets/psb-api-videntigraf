@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/assertions-in-tests */
 import type { RequestListener } from 'node:http';
 import express, { type Express } from 'express';
 import { expect } from 'chai';
