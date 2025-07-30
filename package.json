@@ -24,7 +24,7 @@
     "@myrotvorets/express-microservice-middlewares": "^3.1.2",
     "@myrotvorets/express-otel-middlewares": "^2.0.0",
     "@myrotvorets/express-request-logger": "^1.2.3",
-    "@myrotvorets/facex": "^2.7.0",
+    "@myrotvorets/facex": "^2.7.1",
     "@myrotvorets/oav-installer": "^5.0.1",
     "@myrotvorets/opentelemetry-configurator": "^8.1.0",
     "@myrotvorets/otel-utils": "^2.0.0",
