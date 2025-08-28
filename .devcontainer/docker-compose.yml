@@ -70,7 +70,7 @@ services:
       - ./.docker/grafana/dashboards/app.json:/var/lib/grafana/dashboards/app.json
 
   swagger:
-    image: swaggerapi/swagger-ui:v5.27.1@sha256:b1349bb9d73b731bef71bcbb40470d88386c7e806db4b8e2abef73410ab8f889
+    image: swaggerapi/swagger-ui:v5.28.0@sha256:9412bfd188ebeb6797d21845b8e86c362ad4f42d974006d7b44dca3fac99e0bb
     environment:
       - SWAGGER_JSON_URL=/specs/videntigraf-private.yaml
       - BASE_URL=/swagger
