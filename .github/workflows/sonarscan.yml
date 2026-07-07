@@ -36,6 +36,8 @@ jobs:
             pipelinesghubeus23.actions.githubusercontent.com:443
             pkg-npm.githubusercontent.com:443
             registry.npmjs.org:443
+            keyserver.ubuntu.com:443
+            keys.openpgp.org:443
             api.sonarcloud.io:443
             analysis-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
             sc-cleancode-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
